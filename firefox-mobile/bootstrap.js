@@ -29,12 +29,12 @@ let desktopModeListener = {
   },
   showMessage: function() {
     let buttons = [{
-        label: "Yes",
-        positive: true,
-        callback: () => reportIssue(this.win)
-      }, {
-        label: "No thanks",
-        callback: () => {}
+      label: "Yes",
+      positive: true,
+      callback: () => reportIssue(this.win)
+    }, {
+      label: "No thanks",
+      callback: () => {}
     }];
     let message = "Would you like to report an issue with the mobile site at webcompat.com?";
     let options = {
@@ -48,7 +48,7 @@ let desktopModeListener = {
 
 function loadIntoWindow(window) {
   if (!window)
-    return;
+  {return;}
 
   desktopModeListener.init(window);
 
@@ -61,7 +61,7 @@ function loadIntoWindow(window) {
 
 function unloadFromWindow(window) {
   if (!window)
-    return;
+  {return;}
 
   desktopModeListener.uninit();
   window.NativeWindow.menu.remove(menuItem);
@@ -76,7 +76,7 @@ var windowListener = {
   onOpenWindow: function(aWindow) {
     // Wait for the window to finish loading
     let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-                    .getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+      .getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
     domWindow.addEventListener("load", function() {
       domWindow.removeEventListener("load", arguments.callee, false);
       loadIntoWindow(domWindow);
@@ -103,7 +103,7 @@ function shutdown(aData, aReason) {
   // When the application is shutting down we normally don't have to clean
   // up any UI changes made
   if (aReason == APP_SHUTDOWN)
-    return;
+  {return;}
 
   // Stop listening for new windows
   Services.wm.removeListener(windowListener);

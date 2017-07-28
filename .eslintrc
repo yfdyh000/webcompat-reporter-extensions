@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es6": true
@@ -7,6 +8,7 @@
   "globals": {
     chrome: true,
     content: true,
+    safari: true,
     Components: true,
     XPCOMUtils: true,
     CustomizableUI: true,

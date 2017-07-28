@@ -2,24 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var prefix = 'https://webcompat.com/issues/new?url=';
-var screenshotData = '';
-var reporterID = 'addon-reporter-firefox';
+const prefix = "https://webcompat.com/issues/new?url=";
+const reporterID = "addon-reporter-firefox";
 
-chrome.contextMenus.create({
-  id: 'webcompat-contextmenu',
-  title: 'Report site issue',
-  contexts: ['all']
+browser.contextMenus.create({
+  id: "webcompat-contextmenu",
+  title: "Report site issue",
+  contexts: ["all"]
 });
 
 function reportIssue(tab) {
-  chrome.tabs.captureVisibleTab({format: 'png'}, function(res) {
-    screenshotData = res;
-    chrome.tabs.query({currentWindow: true, active: true}, function(tab) {
-      var newTabUrl =
+  browser.tabs.captureVisibleTab({ format: "png" }).then((screenshotData) => {
+    browser.tabs.query({ currentWindow: true, active: true }).then((tab) => {
+      let newTabUrl =
         `${prefix}${encodeURIComponent(tab[0].url)}&src=${reporterID}`;
-      chrome.tabs.create({ 'url': newTabUrl}, function(tab) {
-        chrome.tabs.executeScript({
+      browser.tabs.create({ "url": newTabUrl}).then(() => {
+        browser.tabs.executeScript({
           code: `window.postMessage("${screenshotData}", "*")`
         });
       });
@@ -36,18 +34,19 @@ function enableOrDisable(tabId, changeInfo, tab) {
                     url.startsWith("view-source"));
   }
 
-  if (changeInfo.status == "loading" && isReportableURL(tab.url)) {
-    chrome.browserAction.enable(tabId);
-  } else if (changeInfo.status == "loading" && !isReportableURL(tab.url)) {
-    chrome.browserAction.disable(tabId);
+  if (changeInfo.status !== "loading") { return; }
+  if (isReportableURL(tab.url)) {
+    browser.browserAction.enable(tabId);
+  } else {
+    browser.browserAction.disable(tabId);
   }
 }
 
-chrome.tabs.onCreated.addListener((tab) => {
+browser.tabs.onCreated.addListener((tab) => {
   // disable all new tabs until they've loaded and we know
   // they have reportable URLs
-  chrome.browserAction.disable(tab.tabId);
-})
-chrome.tabs.onUpdated.addListener(enableOrDisable);
-chrome.contextMenus.onClicked.addListener(reportIssue);
-chrome.browserAction.onClicked.addListener(reportIssue);
+  browser.browserAction.disable(tab.tabId);
+});
+browser.tabs.onUpdated.addListener(enableOrDisable);
+browser.contextMenus.onClicked.addListener(reportIssue);
+browser.browserAction.onClicked.addListener(reportIssue);
